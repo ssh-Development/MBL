@@ -1,0 +1,99 @@
+﻿@inherits LayoutComponentBase
+@implements IDisposable
+
+@inject NavigationManager NavigationManager
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
+
+@code{
+	MudTheme MyCustomTheme = new MudTheme()
+	{
+		PaletteLight = new PaletteLight()
+		{
+			Primary = Colors.Red.Darken4,
+			AppbarBackground = Colors.Gray.Darken3,
+		},
+		PaletteDark = new PaletteDark()
+		{
+
+		}
+	};
+}
+
+<MudThemeProvider Theme="MyCustomTheme" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+	<MudAppBar>
+		<MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+		<MudSpacer />
+		<AuthorizeView>
+			<Authorized>
+				<MudMenu>
+					<ActivatorContent>
+						<MudAvatar Color="Color.Primary" Variant="Variant.Filled">@userInitials</MudAvatar>
+					</ActivatorContent>
+					<ChildContent>
+						<MudMenuItem Href="Account/Logout"
+									 Icon="@Icons.Material.TwoTone.Logout"
+									 Label="Abmelden" />
+					</ChildContent>
+				</MudMenu>
+			</Authorized>
+			<NotAuthorized>
+				<MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Outlined.Login" Href="Account/Login" Color="Color.Primary">Anmelden</MudButton>
+			</NotAuthorized>
+		</AuthorizeView>
+	</MudAppBar>
+	<MudDrawer @bind-Open="@_drawerOpen">
+		<NavMenu />
+	</MudDrawer>
+	<MudMainContent>
+		@Body
+	</MudMainContent>
+</MudLayout>
+
+@code {
+	bool _drawerOpen = true;
+
+	void DrawerToggle()
+	{
+		_drawerOpen = !_drawerOpen;
+	}
+
+	private string? currentUrl;
+	private ApplicationUser? user;
+
+	private string? userInitials;
+
+	[CascadingParameter]
+	private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await authenticationStateTask;
+		user = await UserManager.GetUserAsync(authState.User);
+
+		if(user is not null)
+		{
+			userInitials = string.Empty;
+			userInitials += user.FirstName?.ToUpper().First();
+			userInitials += user.LastName?.ToUpper().First();
+		}
+
+		currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+		NavigationManager.LocationChanged += OnLocationChanged;
+	}
+
+	private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+	{
+		currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+		StateHasChanged();
+	}
+
+	public void Dispose()
+	{
+		NavigationManager.LocationChanged -= OnLocationChanged;
+	}
+}

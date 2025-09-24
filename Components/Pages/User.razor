@@ -1,0 +1,82 @@
+﻿@page "/users"
+
+@inject IDbContextFactory<ApplicationDbContext> contextFactory
+
+	<style>
+		.selected {
+			background-color: #1E88E5 !important;
+		}
+
+			.selected > td {
+				color: white !important;
+			}
+
+				.selected > td .mud-input {
+					color: white !important;
+				}
+	</style>
+
+<PageTitle>Benutzer</PageTitle>
+<MudGrid>
+	<MudItem xs="12" sm="7">
+			<MudTable T="ApplicationUser" Items="@Elements.Take(4)" Hover="true" Breakpoint="Breakpoint.Sm" Loading="@_loading" LoadingProgressColor="Color.Primary" OnRowClick="RowClickEvent">
+				<HeaderContent>
+					<MudTh>Personalnummer</MudTh>
+					<MudTh>Vorname</MudTh>
+					<MudTh Style="color: brown; font-size: small;">Nachname</MudTh>
+				</HeaderContent>
+				<RowTemplate>
+					<MudTd DataLabel="Sign">@context.EmployeeId</MudTd>
+					<MudTd DataLabel="Sign">@context.FirstName</MudTd>
+					<MudTd DataLabel="Name">@context.LastName</MudTd>
+				</RowTemplate>
+			</MudTable>
+		<MudPaper Class="pa-4 mt-4">
+			
+		</MudPaper>
+	</MudItem>
+	<MudItem xs="12" sm="5">
+		<MudPaper Class="pa-4 mud-height-full">
+		@if(selectedUser is not null)
+						{
+							<p>@selectedUser.FirstName</p>
+
+
+						}
+		</MudPaper>
+	</MudItem>
+</MudGrid>
+
+
+@code {
+	private bool _hidePosition;
+	private bool _loading;
+	private IEnumerable<ApplicationUser> Elements = new List<ApplicationUser>();
+	private ApplicationUser? selectedUser;
+
+	protected override async Task OnInitializedAsync()
+	{
+		if(_loading)
+		{
+			return;
+		}
+
+		try
+		{
+			_loading = true;
+
+			using var context = await contextFactory.CreateDbContextAsync();
+
+			Elements = await context.Users.ToListAsync();
+		}
+		finally
+		{
+			_loading = false;
+		}
+	}
+
+	private void RowClickEvent(TableRowClickEventArgs<ApplicationUser> tableRowClickEventArgs)
+	{
+		selectedUser = tableRowClickEventArgs.Item;
+	}
+}
