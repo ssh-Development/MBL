@@ -1,3 +1,4 @@
+using DataAccsessPSI.PMBL93;
 using MBL.Components;
 using MBL.Components.Account;
 using MBL.Data;
@@ -24,10 +25,16 @@ builder.Services.AddAuthentication(options =>
     })
     .AddIdentityCookies();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var appConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseSqlServer(appConnectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+var psiConnectionString = builder.Configuration.GetConnectionString("PSIConnection") ?? throw new InvalidOperationException("Connection string 'PSIConnection' not found.");
+
+builder.Services.AddDbContextFactory<Pmbl93DbContext>(options =>
+    options.UseSqlServer(psiConnectionString));
 
 builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>()

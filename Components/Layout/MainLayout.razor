@@ -1,6 +1,7 @@
 ﻿@inherits LayoutComponentBase
 @implements IDisposable
 
+@inject IDialogService DialogService
 @inject NavigationManager NavigationManager
 @inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
 
@@ -42,7 +43,7 @@
 				</MudMenu>
 			</Authorized>
 			<NotAuthorized>
-				<MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Outlined.Login" Href="Account/Login" Color="Color.Primary">Anmelden</MudButton>
+				<MudButton Variant="Variant.Filled" EndIcon="@Icons.Material.Outlined.Login" Color="Color.Primary" @onclick="OpenDialogAsync">Anmelden</MudButton>
 			</NotAuthorized>
 		</AuthorizeView>
 	</MudAppBar>
@@ -75,7 +76,7 @@
 		var authState = await authenticationStateTask;
 		user = await UserManager.GetUserAsync(authState.User);
 
-		if(user is not null)
+		if (user is not null)
 		{
 			userInitials = string.Empty;
 			userInitials += user.FirstName?.ToUpper().First();
@@ -84,6 +85,13 @@
 
 		currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
 		NavigationManager.LocationChanged += OnLocationChanged;
+	}
+
+	private Task OpenDialogAsync()
+	{
+		var options = new DialogOptions { CloseOnEscapeKey = true };
+
+		return DialogService.ShowAsync<MBL.Components.Pages.Dialoges.Login>("Login", options);
 	}
 
 	private void OnLocationChanged(object? sender, LocationChangedEventArgs e)

@@ -8,11 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.6" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.6" />
-    <PackageReference Include="MudBlazor" Version="8.8.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="9.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="MudBlazor" Version="8.13.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataAccsessPSI\DataAccsessPSI.csproj" />
   </ItemGroup>
 
 </Project>
